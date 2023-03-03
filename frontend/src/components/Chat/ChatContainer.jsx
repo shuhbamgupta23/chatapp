@@ -13,19 +13,23 @@ import { useDispatch } from "react-redux";
 import { sendMessage } from "../../actions/contactAction";
 import { io } from "socket.io-client";
 
-
 const initialData = { message: "", from: "", to: "" };
 
-const ChatContainer = () => {
-  const [arrivalMessage, setArrivalMessage] = useState(null)
-  const [message, setMessage] =  useState();
+const ChatContainer = ({currentContact}) => {
+  const [chats, setChats] = useState(JSON.parse(localStorage.getItem("currentUserMessageLog")))
+  useEffect(() => {
+    console.log("done")
+    setChats(JSON.parse(localStorage.getItem("currentUserMessageLog")))
+  },[currentContact])
+  const [arrivalMessage, setArrivalMessage] = useState(null);
+  const [message, setMessage] = useState();
+
   const dispatch = useDispatch();
-  const currentContact = JSON.parse(localStorage.getItem("currentUser"))?.name;
   const to = JSON.parse(localStorage.getItem("currentUser"))?._id;
   const from = JSON.parse(localStorage.getItem("userData"))?.result?._id;
   const socket = useRef();
 
-  const chats = JSON.parse(localStorage.getItem("currentUserMessageLog"));
+
   const data = [];
   if (chats !== null) {
     if (Object.keys(chats).length > 0) {
@@ -44,21 +48,20 @@ const ChatContainer = () => {
     }
   }, [from]);
 
-  console.log(socket,"sdasa")
-  
+
+
   useEffect(() => {
-    if(socket.current){
+    if (socket.current) {
       socket.current.on("msg-recieved", (msg) => {
         console.log(msg);
-        setArrivalMessage({mySelf:false, message:msg})
-      })
+        setArrivalMessage({ mySelf: false, message: msg });
+      });
     }
-  },[arrivalMessage])
+  }, [arrivalMessage]);
 
   useEffect(() => {
-    arrivalMessage && setMessage((pre)=>[...pre, arrivalMessage])
-  },[arrivalMessage])
-
+    arrivalMessage && setMessage((pre) => [...pre, arrivalMessage]);
+  }, [arrivalMessage]);
 
   const [form, setForm] = useState(initialData);
 
@@ -69,16 +72,15 @@ const ChatContainer = () => {
       ["from"]: from,
       ["to"]: to,
     });
-    console.log(form);
   };
 
   const send = (e) => {
     e.preventDefault();
-    socket.current.emit("send-msg",{
-      to:to,
-      from:from,
-      message:form["message"]
-    })
+    socket.current?.emit("send-msg", {
+      to: to,
+      from: from,
+      message: form["message"],
+    });
     dispatch(sendMessage(form));
   };
 

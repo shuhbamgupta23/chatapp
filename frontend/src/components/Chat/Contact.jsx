@@ -3,10 +3,8 @@ import { Container, TextField, Button, Toolbar } from "@mui/material";
 import { useDispatch } from "react-redux";
 import { getMessage } from "../../actions/contactAction";
 import { getAllUser, searchFriend } from "../../actions/userAction";
-let arr = JSON.parse(localStorage.getItem("allContacts"))?.result;
-
 let initialState = { from: "", to: "" };
-const Contact = () => {
+const Contact = ({ buttonClick, allContact }) => {
   let to = JSON.parse(localStorage.getItem("currentUser"))?._id;
   let from = JSON.parse(localStorage.getItem("userData"))?.result?._id;
   const dispatch = useDispatch();
@@ -14,21 +12,18 @@ const Contact = () => {
   const [searchTag, setSearchTag] = useState("");
   const handleContactClick = (i) => {
     setForm({ ...form, ["to"]: to, ["from"]: from });
-    dispatch({ type: "currentUser", payload: arr[i] });
+    dispatch({ type: "currentUser", payload: allContact[i] });
+    buttonClick(JSON.parse(localStorage.getItem("currentUser"))?.name);
     dispatch(getMessage(form));
   };
+
   dispatch(getAllUser());
   const handleSearchChange = (e) => {
-    setSearchTag(e.target.value)
-
-  }
-  const handleSearchClick = () =>{
-    dispatch(searchFriend(searchTag))
-  }
-
-  useEffect(() => {
-    arr = JSON.parse(localStorage.getItem("allContacts"))?.result;
-  },[JSON.parse(localStorage.getItem('allContacts'))])
+    setSearchTag(e.target.value);
+  };
+  const handleSearchClick = () => {
+    dispatch(searchFriend(searchTag));
+  };
 
   return (
     <Container
@@ -48,20 +43,28 @@ const Contact = () => {
           name="searchName"
           label="Search your friends"
           fullWidth
-          onChange = {handleSearchChange}
+          onChange={handleSearchChange}
         />
-        <Button variant="contained" size="large" sx = {{ml:"10px"}} onClick = {handleSearchClick}>
+        <Button
+          variant="contained"
+          size="large"
+          sx={{ ml: "10px" }}
+          onClick={handleSearchClick}
+        >
           Search
         </Button>
       </Toolbar>
-      {arr !== null &&
-     
-        arr.map((contact, i) => {
+      {(allContact !== null || allContact !== undefined) &&
+        allContact?.map((contact, i) => {
           return (
             contact["_id"] !== from && (
               <Button
                 color="primary"
-                sx={{ margin: "5px 0", backgroundColor: "black", textTransform: 'none' }}
+                sx={{
+                  margin: "5px 0",
+                  backgroundColor: "black",
+                  textTransform: "none",
+                }}
                 variant="contained"
                 size="large"
                 fullWidth
