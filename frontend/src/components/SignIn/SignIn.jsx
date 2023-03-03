@@ -12,6 +12,7 @@ import {
 import { useDispatch } from "react-redux";
 
 import { signIn, signUp } from "../../actions/userAction";
+import { getAllUser } from "../../actions/userAction";
 
 const initialState = {
   firstName: "",
@@ -21,7 +22,7 @@ const initialState = {
   confirmPassword: "",
 };
 
-const SignIn = () => {
+const SignIn = ({ handleSignIn1}) => {
   const history = useHistory();
     const dispatch = useDispatch();
 
@@ -44,6 +45,10 @@ const SignIn = () => {
     } else {
       dispatch(signIn(formData, history));
     }
+    dispatch(getAllUser());
+    setTimeout(()=>{
+      handleSignIn1(JSON.parse(localStorage.getItem("userData")));
+    },[100])
   };
 
   return (

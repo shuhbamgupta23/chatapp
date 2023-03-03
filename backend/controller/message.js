@@ -35,7 +35,7 @@ export const getMessage = async (req, res) => {
         message: msg.message,
       };
     });
-
+    console.log(allMessage,"haan bhai ni hora kia");
     return res.status(200).json(allMessage);
   } catch (err) {
     res.status(500).json("Something not good happened");
